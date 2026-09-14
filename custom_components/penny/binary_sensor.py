@@ -56,13 +56,32 @@ class PennyEbonSubscriptionSensor(
     def is_on(self) -> bool | None:
         if not self.coordinator.data:
             return None
-        subscription = self.coordinator.data.get("subscription", {})
-        val = subscription.get("isSubscribed")
-        return bool(val) if val is not None else None
+        subscription = self.coordinator.data.get("subscription")
+        if subscription is None:
+            return None
+        if isinstance(subscription, bool):
+            return subscription
+        if isinstance(subscription, dict):
+            if not subscription:
+                return None
+            for key in ("isSubscribed", "subscribed", "active", "status", "optIn"):
+                if key in subscription:
+                    val = subscription[key]
+                    if isinstance(val, bool):
+                        return val
+                    if isinstance(val, str):
+                        return val.lower() in ("true", "active", "subscribed", "yes", "1")
+        if isinstance(subscription, list):
+            return len(subscription) > 0
+        return None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        return {ATTR_ATTRIBUTION: ATTRIBUTION}
+        subscription = (self.coordinator.data or {}).get("subscription")
+        attrs: dict[str, Any] = {ATTR_ATTRIBUTION: ATTRIBUTION}
+        if isinstance(subscription, dict):
+            attrs.update(subscription)
+        return attrs
 
     @property
     def available(self) -> bool:

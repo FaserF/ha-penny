@@ -365,7 +365,7 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_reauth_start(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Show the re-auth URL."""
+        """Show the re-auth URL and accept redirect URL or code in a single step."""
         errors: dict[str, str] = {}
         if not self._pkce_verifier:
             (
@@ -391,63 +391,65 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
                 _LOGGER.error("PENNY re-auth OIDC discovery failed: %s", exc)
                 errors["base"] = "oidc_discovery_failed"
 
-        if user_input is not None and not errors:
-            return await self.async_step_reauth_code()
-
-        schema = vol.Schema({vol.Optional("_placeholder", default=""): str})
-        return self.async_show_form(
-            step_id="reauth_start",
-            data_schema=schema,
-            errors=errors,
-            description_placeholders={"auth_url": self._auth_url},
-        )
-
-    async def async_step_reauth_code(
-        self, user_input: dict[str, Any] | None = None
-    ) -> config_entries.ConfigFlowResult:
-        """Accept the new authorization code during re-auth."""
-        errors: dict[str, str] = {}
-        if user_input is not None:
+        if user_input is not None and user_input.get("redirect_url_or_code"):
             raw = user_input.get("redirect_url_or_code", "").strip()
             code = _extract_code(raw)
             if not code:
                 errors["base"] = "invalid_code"
             else:
-                try:
-                    client = PennyAPIClient()
-                    await self.hass.async_add_executor_job(
-                        client.fetch_oidc_discovery, PENNY_OIDC_DISCOVERY
-                    )
-                    tokens = await self.hass.async_add_executor_job(
-                        client.exchange_code_for_tokens,
-                        code,
-                        self._pkce_verifier,
-                        PENNY_CLIENT_ID,
-                        PENNY_REDIRECT_URI,
-                    )
-                    new_data = {
-                        **self._config_entry.data,
-                        CONF_ACCESS_TOKEN: tokens.get("access_token", ""),
-                        CONF_REFRESH_TOKEN: tokens.get(
+                state_ok = True
+                if raw.startswith("http"):
+                    parsed_state = _extract_param(raw, "state")
+                    if parsed_state and parsed_state != self._oauth_state:
+                        _LOGGER.warning(
+                            "PENNY OAuth state mismatch: expected %s, got %s",
+                            self._oauth_state,
+                            parsed_state,
+                        )
+                        errors["base"] = "state_mismatch"
+                        state_ok = False
+
+                if state_ok:
+                    try:
+                        client = PennyAPIClient()
+                        await self.hass.async_add_executor_job(
+                            client.fetch_oidc_discovery, PENNY_OIDC_DISCOVERY
+                        )
+                        tokens = await self.hass.async_add_executor_job(
+                            client.exchange_code_for_tokens,
+                            code,
+                            self._pkce_verifier,
+                            PENNY_CLIENT_ID,
+                            PENNY_REDIRECT_URI,
+                        )
+                        access_token = tokens.get("access_token", "")
+                        refresh_token = tokens.get(
                             "refresh_token",
                             self._config_entry.data.get(CONF_REFRESH_TOKEN, ""),
-                        ),
-                        CONF_ACCESS_TOKEN_EXPIRES_AT: time.time()
-                        + int(tokens.get("expires_in", 300)),
-                    }
-                    self.hass.config_entries.async_update_entry(
-                        self._config_entry, data=new_data
-                    )
-                    return self.async_create_entry(
-                        title="", data=self._config_entry.options
-                    )
-                except Exception as exc:  # noqa: BLE001
-                    _LOGGER.error("PENNY re-auth token exchange failed: %s", exc)
-                    errors["base"] = "token_exchange_failed"
+                        )
+                        expires_at = time.time() + int(tokens.get("expires_in", 300))
+                        rewe_id = decode_rewe_id(access_token) or self._config_entry.data.get(CONF_REWE_ID, "")
+
+                        new_data = {
+                            **self._config_entry.data,
+                            CONF_ACCESS_TOKEN: access_token,
+                            CONF_REFRESH_TOKEN: refresh_token,
+                            CONF_ACCESS_TOKEN_EXPIRES_AT: expires_at,
+                            CONF_REWE_ID: rewe_id,
+                        }
+                        self.hass.config_entries.async_update_entry(
+                            self._config_entry, data=new_data
+                        )
+                        return self.async_create_entry(
+                            title="", data=self._config_entry.options
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        _LOGGER.error("PENNY re-auth token exchange failed: %s", exc)
+                        errors["base"] = "token_exchange_failed"
 
         schema = vol.Schema({vol.Required("redirect_url_or_code"): str})
         return self.async_show_form(
-            step_id="reauth_code",
+            step_id="reauth_start",
             data_schema=schema,
             errors=errors,
             description_placeholders={"auth_url": self._auth_url},

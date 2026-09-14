@@ -51,14 +51,7 @@
       },
       "reauth_start": {
         "title": "Erneut bei PENNY anmelden",
-        "description": "Öffne die folgende URL im Browser und melde dich an:\n\n`{auth_url}`\n\nKlicke danach auf Absenden, um die Weiterleitungs-URL einzugeben.",
-        "data": {
-          "_placeholder": "Klicke auf Absenden zum Fortfahren"
-        }
-      },
-      "reauth_code": {
-        "title": "Weiterleitungs-URL einfügen",
-        "description": "Füge die vollständige Weiterleitungs-URL oder den Wert nach `code=` ein.\n\n**Auth-URL:** `{auth_url}`",
+        "description": "## PENNY Anmeldung\n\n1. Öffne die folgende URL im Browser und melde dich mit deinem PENNY-Konto an:\n\n`{auth_url}`\n\n2. Nach der Anmeldung leitet dein Browser auf eine Seite weiter wie:\n`https://www.penny.de/app/login?code=...&state=...`\n\n3. Kopiere die vollständige Weiterleitungs-URL aus der Adresszeile (oder nur den Wert nach `code=`), füge sie unten ein und klicke auf **Absenden**.",
         "data": {
           "redirect_url_or_code": "Weiterleitungs-URL oder Autorisierungscode"
         }
