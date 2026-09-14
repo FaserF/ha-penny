@@ -181,9 +181,10 @@ class PennyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         # Generate PKCE pair + state on first render
         if not self._pkce_verifier:
-            self._pkce_verifier, self._pkce_challenge = await self.hass.async_add_executor_job(
-                generate_pkce_pair
-            )
+            (
+                self._pkce_verifier,
+                self._pkce_challenge,
+            ) = await self.hass.async_add_executor_job(generate_pkce_pair)
             self._oauth_state = uuid.uuid4().hex
 
             try:
@@ -312,7 +313,9 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
                     if f.strip()
                 ]
             elif isinstance(raw_filters, list):
-                product_filters = [str(f).strip() for f in raw_filters if str(f).strip()]
+                product_filters = [
+                    str(f).strip() for f in raw_filters if str(f).strip()
+                ]
             else:
                 product_filters = []
 
@@ -365,9 +368,10 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
         """Show the re-auth URL."""
         errors: dict[str, str] = {}
         if not self._pkce_verifier:
-            self._pkce_verifier, self._pkce_challenge = (
-                await self.hass.async_add_executor_job(generate_pkce_pair)
-            )
+            (
+                self._pkce_verifier,
+                self._pkce_challenge,
+            ) = await self.hass.async_add_executor_job(generate_pkce_pair)
             self._oauth_state = uuid.uuid4().hex
             try:
                 client = PennyAPIClient()
@@ -375,6 +379,7 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
                     client.fetch_oidc_discovery, PENNY_OIDC_DISCOVERY
                 )
                 from .api import build_auth_url
+
                 self._auth_url = build_auth_url(
                     authorization_endpoint=discovery["authorization_endpoint"],
                     state=self._oauth_state,

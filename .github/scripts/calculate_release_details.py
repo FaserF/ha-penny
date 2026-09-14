@@ -79,7 +79,9 @@ def main():
 
     subprocess.check_call(cl_args)
 
-    with open(os.environ.get("GITHUB_OUTPUT", "output.txt"), "a", encoding="utf-8") as f:
+    with open(
+        os.environ.get("GITHUB_OUTPUT", "output.txt"), "a", encoding="utf-8"
+    ) as f:
         f.write(f"version={version}\n")
         f.write(f"tag={tag}\n")
         f.write(f"is_prerelease={is_prerelease}\n")

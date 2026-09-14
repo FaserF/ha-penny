@@ -56,7 +56,9 @@ def test_decode_rewe_id():
     import json
 
     payload = {"rewe_id": "12345678", "sub": "some-sub"}
-    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    payload_b64 = (
+        base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    )
     fake_jwt = f"header.{payload_b64}.signature"
     result = PennyAPIClient.decode_rewe_id(fake_jwt)
     assert result == "12345678"
@@ -67,7 +69,9 @@ def test_decode_rewe_id_fallback_sub():
     import json
 
     payload = {"sub": "sub-uuid"}
-    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    payload_b64 = (
+        base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    )
     fake_jwt = f"header.{payload_b64}.signature"
     result = PennyAPIClient.decode_rewe_id(fake_jwt)
     assert result == "sub-uuid"
@@ -232,9 +236,7 @@ def test_client_get_all_ebons_pagination():
         "pagination": {"currentPage": 2, "pageCount": 2},
     }
 
-    with patch(
-        "custom_components.penny.api.requests.get", side_effect=[page1, page2]
-    ):
+    with patch("custom_components.penny.api.requests.get", side_effect=[page1, page2]):
         ebons = client.get_all_ebons("12345")
     assert len(ebons) == 3
     assert ebons[2]["id"] == "c"

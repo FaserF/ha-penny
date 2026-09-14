@@ -39,6 +39,7 @@ def clean_and_update_template(file_path, integration_version, ha_version, repo_n
         field_id = field_id_match.group(1)
 
         if field_id in ("integration_version", "version"):
+
             def repl_ver(match):
                 quote = match.group(1) or ""
                 prefix = match.group(2) or ""
@@ -52,6 +53,7 @@ def clean_and_update_template(file_path, integration_version, ha_version, repo_n
             blocks[i] = new_block
 
         elif field_id == "ha_version":
+
             def repl_ha(match):
                 quote = match.group(1) or ""
                 prefix = match.group(2) or ""

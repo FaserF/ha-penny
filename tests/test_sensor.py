@@ -1,6 +1,5 @@
 """Tests for PENNY sensor platform."""
 
-
 import pytest
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -22,7 +21,12 @@ MOCK_DATA = {
             "id": "ebon-001",
             "timestamp": "2026-09-05T16:00:48Z",
             "totalPrice": 1164,
-            "market": {"name": "PENNY", "street": "Musterstr. 1", "zipCode": "12345", "city": "Berlin"},
+            "market": {
+                "name": "PENNY",
+                "street": "Musterstr. 1",
+                "zipCode": "12345",
+                "city": "Berlin",
+            },
             "cancelled": False,
         },
         {
@@ -38,10 +42,22 @@ MOCK_DATA = {
         "timestamp": "2026-09-05T16:00:48Z",
         "total": 11.64,
         "total_cents": 1164,
-        "market": {"name": "PENNY", "street": "Musterstr. 1", "zipCode": "12345", "city": "Berlin"},
+        "market": {
+            "name": "PENNY",
+            "street": "Musterstr. 1",
+            "zipCode": "12345",
+            "city": "Berlin",
+        },
         "cancelled": False,
         "items": [
-            {"name": "Pepsi Cola Zero", "price": 8.94, "tax_code": "A", "discount_excluded": False, "quantity": 2, "unit_price": 4.47}
+            {
+                "name": "Pepsi Cola Zero",
+                "price": 8.94,
+                "tax_code": "A",
+                "discount_excluded": False,
+                "quantity": 2,
+                "unit_price": 4.47,
+            }
         ],
         "savings": 0.30,
         "loyalty_points": 4,
@@ -50,11 +66,27 @@ MOCK_DATA = {
         "receipt_number": "12345",
         "payment_method": "EC-Karte",
         "payment_amount": 11.64,
-        "tax_breakdown": [{"code": "A", "rate_percent": 19.0, "net": 9.78, "tax": 1.86, "gross": 11.64}],
+        "tax_breakdown": [
+            {
+                "code": "A",
+                "rate_percent": 19.0,
+                "net": 9.78,
+                "tax": 1.86,
+                "gross": 11.64,
+            }
+        ],
     },
     "subscription": {"isSubscribed": True},
     "product_filter_results": {
-        "Pepsi": [{"name": "Pepsi Cola Zero", "price": 8.94, "tax_code": "A", "quantity": 2, "unit_price": 4.47}]
+        "Pepsi": [
+            {
+                "name": "Pepsi Cola Zero",
+                "price": 8.94,
+                "tax_code": "A",
+                "quantity": 2,
+                "unit_price": 4.47,
+            }
+        ]
     },
     "rewe_id": "12345678",
 }
@@ -75,6 +107,7 @@ async def _setup_coordinator(hass, data=None, options=None):
     coordinator = PennyDataUpdateCoordinator(hass, entry)
     coordinator.data = data or MOCK_DATA
     from homeassistant.util import dt as dt_util
+
     coordinator._last_success = dt_util.now()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     return entry, coordinator
@@ -83,6 +116,7 @@ async def _setup_coordinator(hass, data=None, options=None):
 async def test_ebons_sensor_state(hass: HomeAssistant) -> None:
     """EbonsSensor.native_value = number of ebons."""
     from custom_components.penny.sensor import PennyEbonsSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyEbonsSensor(coordinator)
     assert sensor.native_value == 2
@@ -91,6 +125,7 @@ async def test_ebons_sensor_state(hass: HomeAssistant) -> None:
 async def test_ebons_sensor_attributes(hass: HomeAssistant) -> None:
     entry, coordinator = await _setup_coordinator(hass)
     from custom_components.penny.sensor import PennyEbonsSensor
+
     sensor = PennyEbonsSensor(coordinator)
     attrs = sensor.extra_state_attributes
     assert "ebons" in attrs
@@ -101,6 +136,7 @@ async def test_ebons_sensor_attributes(hass: HomeAssistant) -> None:
 async def test_last_receipt_sensor_state(hass: HomeAssistant) -> None:
     """LastReceiptSensor.native_value = total in EUR."""
     from custom_components.penny.sensor import PennyLastReceiptSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyLastReceiptSensor(coordinator)
     assert sensor.native_value == 11.64
@@ -108,6 +144,7 @@ async def test_last_receipt_sensor_state(hass: HomeAssistant) -> None:
 
 async def test_last_receipt_sensor_attributes(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennyLastReceiptSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyLastReceiptSensor(coordinator)
     attrs = sensor.extra_state_attributes
@@ -120,6 +157,7 @@ async def test_last_receipt_sensor_attributes(hass: HomeAssistant) -> None:
 
 async def test_savings_sensor(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennySavingsSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennySavingsSensor(coordinator)
     assert sensor.native_value == 0.30
@@ -127,6 +165,7 @@ async def test_savings_sensor(hass: HomeAssistant) -> None:
 
 async def test_loyalty_points_sensor(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennyLoyaltyPointsSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyLoyaltyPointsSensor(coordinator)
     assert sensor.native_value == 4
@@ -134,6 +173,7 @@ async def test_loyalty_points_sensor(hass: HomeAssistant) -> None:
 
 async def test_product_filter_sensor_match(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennyProductFilterSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyProductFilterSensor(coordinator, "Pepsi")
     assert sensor.native_value == "8.94 €"
@@ -145,6 +185,7 @@ async def test_product_filter_sensor_match(hass: HomeAssistant) -> None:
 
 async def test_product_filter_sensor_no_match(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennyProductFilterSensor
+
     entry, coordinator = await _setup_coordinator(hass)
     sensor = PennyProductFilterSensor(coordinator, "Butter")
     assert sensor.native_value == "Nicht im Beleg"
@@ -152,9 +193,9 @@ async def test_product_filter_sensor_no_match(hass: HomeAssistant) -> None:
     assert attrs["in_receipt"] is False
 
 
-
 async def test_sensor_unavailable_when_no_data(hass: HomeAssistant) -> None:
     from custom_components.penny.sensor import PennyLastReceiptSensor
+
     entry, coordinator = await _setup_coordinator(hass, data=None)
     coordinator.data = None
     sensor = PennyLastReceiptSensor(coordinator)
@@ -192,12 +233,20 @@ async def test_leaflet_and_store_sensors(hass: HomeAssistant) -> None:
 
     leaflet_sensor = PennyLeafletSensor(coordinator)
     assert leaflet_sensor.native_value == "Available"
-    assert leaflet_sensor.extra_state_attributes["leaflet_url"] == data_with_store["leaflet_url"]
-    assert leaflet_sensor.extra_state_attributes["market_name"] == "Penny Hasporter Damm"
+    assert (
+        leaflet_sensor.extra_state_attributes["leaflet_url"]
+        == data_with_store["leaflet_url"]
+    )
+    assert (
+        leaflet_sensor.extra_state_attributes["market_name"] == "Penny Hasporter Damm"
+    )
 
     next_leaflet_sensor = PennyNextLeafletSensor(coordinator)
     assert next_leaflet_sensor.native_value == "Available"
-    assert next_leaflet_sensor.extra_state_attributes["next_week_leaflet_url"] == data_with_store["next_leaflet_url"]
+    assert (
+        next_leaflet_sensor.extra_state_attributes["next_week_leaflet_url"]
+        == data_with_store["next_leaflet_url"]
+    )
 
     status_sensor = PennyStoreStatusSensor(coordinator)
     assert status_sensor.native_value == "Mo.-Sa.: 07:00 bis 22:00 Uhr"

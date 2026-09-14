@@ -53,7 +53,9 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(self, hass: HomeAssistant, entry: config_entries.ConfigEntry) -> None:
         config = {**entry.data, **entry.options}
         self.store_key: str = str(config.get(CONF_STORE_KEY, ""))
-        self.rewe_id: str = str(config.get(CONF_REWE_ID, self.store_key or "penny_guest"))
+        self.rewe_id: str = str(
+            config.get(CONF_REWE_ID, self.store_key or "penny_guest")
+        )
         self._access_token: str = config.get(CONF_ACCESS_TOKEN, "")
         self._refresh_token: str = config.get(CONF_REFRESH_TOKEN, "")
         self._access_token_expires_at: float = float(
@@ -129,7 +131,9 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
         """Load persisted coordinator data (restart-resistance)."""
         cache = await self.store.async_load()
         if not cache:
-            _LOGGER.debug("No PENNY cache found for entry %s", self.config_entry.entry_id)
+            _LOGGER.debug(
+                "No PENNY cache found for entry %s", self.config_entry.entry_id
+            )
             return
 
         self.data = cache
@@ -198,9 +202,7 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
                 self._force_update = False
 
                 async with asyncio.timeout(120):
-                    data = await self.hass.async_add_executor_job(
-                        self._fetch_sync
-                    )
+                    data = await self.hass.async_add_executor_job(self._fetch_sync)
 
             self._last_success = dt_util.now()
             self._consecutive_failures = 0
@@ -294,7 +296,11 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
                     if store.flipping_book_url:
                         self.configuration_url = store.flipping_book_url
             except Exception as exc:  # noqa: BLE001
-                _LOGGER.warning("PENNY: Store metadata fetch failed for store %s: %s", self.store_key, exc)
+                _LOGGER.warning(
+                    "PENNY: Store metadata fetch failed for store %s: %s",
+                    self.store_key,
+                    exc,
+                )
 
         # Unauthenticated / guest mode check
         if not self._access_token and not self._refresh_token:
@@ -310,9 +316,7 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
                 "last_receipt": {},
                 "subscription": {},
                 "product_filter_results": {
-                    pfilter: []
-                    for pfilter in self.product_filters
-                    if pfilter.strip()
+                    pfilter: [] for pfilter in self.product_filters if pfilter.strip()
                 },
                 "rewe_id": self.rewe_id,
                 "store_key": self.store_key,
@@ -408,15 +412,11 @@ class PennyDataUpdateCoordinator(DataUpdateCoordinator):
                 "No refresh token stored – user must re-authenticate via config flow"
             )
 
-        _LOGGER.debug(
-            "PENNY reweId=%s: access token expired, refreshing", self.rewe_id
-        )
+        _LOGGER.debug("PENNY reweId=%s: access token expired, refreshing", self.rewe_id)
         try:
             tokens = client.refresh_tokens(self._refresh_token, PENNY_CLIENT_ID)
         except Exception as exc:
-            raise AuthExpiredError(
-                f"PENNY token refresh failed: {exc}"
-            ) from exc
+            raise AuthExpiredError(f"PENNY token refresh failed: {exc}") from exc
 
         new_access = tokens.get("access_token", "")
         new_refresh = tokens.get("refresh_token") or self._refresh_token

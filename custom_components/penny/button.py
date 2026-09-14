@@ -24,7 +24,9 @@ async def async_setup_entry(
     """Set up PENNY button from a config entry."""
     coordinator: PennyDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     if coordinator.is_authenticated:
-        async_add_entities([PennyForceUpdateButton(coordinator)], update_before_add=False)
+        async_add_entities(
+            [PennyForceUpdateButton(coordinator)], update_before_add=False
+        )
 
 
 class PennyForceUpdateButton(ButtonEntity):

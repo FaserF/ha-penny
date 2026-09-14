@@ -38,6 +38,7 @@ async def _make_coordinator(hass, subscription_data):
         "rewe_id": "12345678",
     }
     from homeassistant.util import dt as dt_util
+
     coordinator._last_success = dt_util.now()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     return coordinator

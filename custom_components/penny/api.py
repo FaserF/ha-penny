@@ -87,7 +87,9 @@ class Store:
         self.selling_region: str = str(data.get("sellingRegion", ""))
         self.next_week_selling_region: str = str(data.get("nextWeekSellingRegion", ""))
         self.flipping_book_url: str = str(data.get("flippingBookURL", ""))
-        self.next_week_flipping_book_url: str = str(data.get("nextWeekFlippingBookURL", ""))
+        self.next_week_flipping_book_url: str = str(
+            data.get("nextWeekFlippingBookURL", "")
+        )
         self.opening_hours: str = str(data.get("openingSentence", ""))
         self.image: str = str(data.get("image", ""))
         self.latitude: float | None = None
@@ -111,7 +113,11 @@ class Store:
     def title(self) -> str:
         """Friendly title for the config entry."""
         if self.city:
-            return f"PENNY {self.city}, {self.street}" if self.street else f"PENNY {self.city}"
+            return (
+                f"PENNY {self.city}, {self.street}"
+                if self.street
+                else f"PENNY {self.city}"
+            )
         return self.name or f"PENNY {self.store_key}"
 
 
@@ -192,8 +198,6 @@ class PennyAPIClient:
                 return store
         return None
 
-
-
     # ------------------------------------------------------------------
     # OIDC discovery (public, no auth)
     # ------------------------------------------------------------------
@@ -214,9 +218,7 @@ class PennyAPIClient:
             )
             return doc
         except Exception as exc:
-            raise RuntimeError(
-                f"PENNY OIDC discovery failed: {exc}"
-            ) from exc
+            raise RuntimeError(f"PENNY OIDC discovery failed: {exc}") from exc
 
     @property
     def authorization_endpoint(self) -> str:
@@ -296,8 +298,6 @@ class PennyAPIClient:
         except Exception as exc:
             raise RuntimeError(f"PENNY token refresh failed: {exc}") from exc
 
-
-
     # ------------------------------------------------------------------
     # Authenticated API requests
     # ------------------------------------------------------------------
@@ -319,9 +319,7 @@ class PennyAPIClient:
         self, rewe_id: str, page: int = 1, objects_per_page: int = 20
     ) -> dict[str, Any]:
         """Fetch a page of eBons for the given customer."""
-        _LOGGER.debug(
-            "Fetching eBons page %d for reweId %s", page, rewe_id
-        )
+        _LOGGER.debug("Fetching eBons page %d for reweId %s", page, rewe_id)
         url = f"{_PENNY_API_BASE}/api/tenants/penny/customers/{rewe_id}/ebons"
         try:
             resp = requests.get(
@@ -338,7 +336,9 @@ class PennyAPIClient:
         except AuthExpiredError:
             raise
         except Exception as exc:
-            raise RuntimeError(f"PENNY eBons fetch failed (page {page}): {exc}") from exc
+            raise RuntimeError(
+                f"PENNY eBons fetch failed (page {page}): {exc}"
+            ) from exc
 
     def get_all_ebons(self, rewe_id: str) -> list[dict[str, Any]]:
         """Fetch all eBons across all pages."""
@@ -356,9 +356,7 @@ class PennyAPIClient:
             if current_page >= page_count:
                 break
             page += 1
-        _LOGGER.debug(
-            "Fetched %d eBons total for reweId %s", len(all_items), rewe_id
-        )
+        _LOGGER.debug("Fetched %d eBons total for reweId %s", len(all_items), rewe_id)
         return all_items
 
     def get_ebon_pdf(self, rewe_id: str, ebon_id: str) -> bytes:
@@ -386,10 +384,7 @@ class PennyAPIClient:
     def get_subscription(self, rewe_id: str) -> dict[str, Any]:
         """Return the eBon opt-in subscription status."""
         _LOGGER.debug("Fetching eBon subscription for reweId %s", rewe_id)
-        url = (
-            f"{_PENNY_API_BASE}/api/tenants/penny/customers/"
-            f"{rewe_id}/subscriptions"
-        )
+        url = f"{_PENNY_API_BASE}/api/tenants/penny/customers/{rewe_id}/subscriptions"
         try:
             resp = requests.get(url, headers=self._headers(), timeout=15.0)
             if resp.status_code == 401:
@@ -400,9 +395,7 @@ class PennyAPIClient:
         except AuthExpiredError:
             raise
         except Exception as exc:
-            raise RuntimeError(
-                f"PENNY subscription fetch failed: {exc}"
-            ) from exc
+            raise RuntimeError(f"PENNY subscription fetch failed: {exc}") from exc
 
 
 # Module-level constant (avoids circular refs from const.py)
@@ -426,9 +419,7 @@ def parse_ebon_pdf(pdf_bytes: bytes) -> dict[str, Any]:
         raise RuntimeError("pypdf is required for PDF parsing") from exc
 
     reader = pypdf.PdfReader(io.BytesIO(pdf_bytes))
-    text = "\n".join(
-        page.extract_text() or "" for page in reader.pages
-    )
+    text = "\n".join(page.extract_text() or "" for page in reader.pages)
     return _parse_ebon_text(text)
 
 
@@ -457,21 +448,11 @@ def _parse_ebon_text(text: str) -> dict[str, Any]:
     )
     _qty_re = re.compile(r"^(\d+)\s+Stk\s+x\s+(\d{1,3}(?:\.\d{3})*,\d{2})")
     _total_re = re.compile(r"^SUMME\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})")
-    _payment_re = re.compile(
-        r"^Geg\.\s+(.+?)\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})"
-    )
-    _datetime_re = re.compile(
-        r"(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2})\s+Bon-Nr\.:(\S+)"
-    )
-    _market_re = re.compile(
-        r"Markt:(\S+)\s+Kasse:(\S+)\s+Bed\.:(\S+)"
-    )
-    _savings_re = re.compile(
-        r"(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s+gespart"
-    )
-    _loyalty_re = re.compile(
-        r"(?:Sie erhalten|Du erh[äa]ltst)\s+(\d+)\s+Treuepunkt"
-    )
+    _payment_re = re.compile(r"^Geg\.\s+(.+?)\s+EUR\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})")
+    _datetime_re = re.compile(r"(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2})\s+Bon-Nr\.:(\S+)")
+    _market_re = re.compile(r"Markt:(\S+)\s+Kasse:(\S+)\s+Bed\.:(\S+)")
+    _savings_re = re.compile(r"(-?\d{1,3}(?:\.\d{3})*,\d{2})\s+EUR\s+gespart")
+    _loyalty_re = re.compile(r"(?:Sie erhalten|Du erh[äa]ltst)\s+(\d+)\s+Treuepunkt")
     _vat_id_re = re.compile(r"UID\s+Nr\.:\s*(\S+)")
     _tax_breakdown_re = re.compile(
         r"^([A-Z])=\s+(-?\d{1,3}(?:\.\d{3})*,\d{2})%\s+"

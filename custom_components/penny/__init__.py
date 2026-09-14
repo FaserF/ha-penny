@@ -71,9 +71,7 @@ async def async_migrate_entry(
     hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry
 ) -> bool:
     """Migrate old entry."""
-    _LOGGER.debug(
-        "Migrating PENNY config entry from version %s", config_entry.version
-    )
+    _LOGGER.debug("Migrating PENNY config entry from version %s", config_entry.version)
     return True
 
 

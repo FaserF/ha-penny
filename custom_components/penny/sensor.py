@@ -71,7 +71,9 @@ async def async_setup_entry(
             clean = product_filter.strip()
             if clean:
                 sensors.append(PennyProductFilterSensor(coordinator, clean))
-                slug = re.sub(r"[^a-zA-Z0-9_]+", "_", clean.lower()).strip("_") or "item"
+                slug = (
+                    re.sub(r"[^a-zA-Z0-9_]+", "_", clean.lower()).strip("_") or "item"
+                )
                 active_slugs.add(f"penny_{coordinator.rewe_id}_filter_{slug}")
 
         # Purge stale filter entities
@@ -85,9 +87,7 @@ async def async_setup_entry(
                 and ent.unique_id not in active_slugs
             ):
                 ent_reg.async_remove(ent.entity_id)
-                _LOGGER.debug(
-                    "PENNY: removed stale filter entity %s", ent.entity_id
-                )
+                _LOGGER.debug("PENNY: removed stale filter entity %s", ent.entity_id)
 
     async_add_entities(sensors, update_before_add=False)
 
@@ -99,7 +99,11 @@ async def async_setup_entry(
 
 def _device_info(coordinator: PennyDataUpdateCoordinator) -> DeviceInfo:
     dev_id = coordinator.store_key or coordinator.rewe_id
-    model_name = "Market & Leaflets" if not coordinator.is_authenticated else "Market & eBon Account"
+    model_name = (
+        "Market & Leaflets"
+        if not coordinator.is_authenticated
+        else "Market & eBon Account"
+    )
     return DeviceInfo(
         identifiers={(DOMAIN, dev_id)},
         name=coordinator.config_entry.title,
@@ -114,9 +118,7 @@ def _device_info(coordinator: PennyDataUpdateCoordinator) -> DeviceInfo:
 # ---------------------------------------------------------------------------
 
 
-class PennyLeafletSensor(
-    CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity
-):
+class PennyLeafletSensor(CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity):
     """Current weekly leaflet / flyer (Blätterkatalog) sensor."""
 
     _attr_icon = "mdi:book-open-page-variant"
@@ -228,14 +230,13 @@ class PennyStoreStatusSensor(
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
 
+
 # ---------------------------------------------------------------------------
 # Sensors
 # ---------------------------------------------------------------------------
 
 
-class PennyEbonsSensor(
-    CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity
-):
+class PennyEbonsSensor(CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity):
     """Number of stored eBons (digital receipts)."""
 
     _attr_icon = "mdi:receipt-text"
@@ -339,9 +340,7 @@ class PennyLastReceiptSensor(
         ) and self.coordinator.data is not None
 
 
-class PennySavingsSensor(
-    CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity
-):
+class PennySavingsSensor(CoordinatorEntity[PennyDataUpdateCoordinator], SensorEntity):
     """Savings on the latest PENNY receipt."""
 
     _attr_icon = "mdi:piggy-bank"
@@ -420,7 +419,9 @@ class PennyProductFilterSensor(
     ) -> None:
         super().__init__(coordinator)
         self._product_filter = product_filter
-        slug = re.sub(r"[^a-zA-Z0-9_]+", "_", product_filter.lower()).strip("_") or "item"
+        slug = (
+            re.sub(r"[^a-zA-Z0-9_]+", "_", product_filter.lower()).strip("_") or "item"
+        )
         self._attr_unique_id = f"penny_{coordinator.rewe_id}_filter_{slug}"
         self._attr_name = f"Filter {product_filter}"
         self._attr_device_info = _device_info(coordinator)

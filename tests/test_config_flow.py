@@ -33,9 +33,7 @@ async def test_config_flow_guest_mode(hass: HomeAssistant) -> None:
 
     sample_store = Store(SAMPLE_STORE_DATA)
 
-    with patch(
-        "custom_components.penny.config_flow.PennyAPIClient"
-    ) as mock_client_cls:
+    with patch("custom_components.penny.config_flow.PennyAPIClient") as mock_client_cls:
         mock_client = MagicMock()
         mock_client.search_markets.return_value = [sample_store]
         mock_client_cls.return_value = mock_client
@@ -73,9 +71,7 @@ async def test_config_flow_oauth_step_shows_form(hass: HomeAssistant) -> None:
         "authorization_endpoint": "https://account.penny.de/realms/penny/protocol/openid-connect/auth",
         "token_endpoint": "https://account.penny.de/realms/penny/protocol/openid-connect/token",
     }
-    with patch(
-        "custom_components.penny.config_flow.PennyAPIClient"
-    ) as mock_client_cls:
+    with patch("custom_components.penny.config_flow.PennyAPIClient") as mock_client_cls:
         mock_client = MagicMock()
         mock_client.search_markets.return_value = [sample_store]
         mock_client.fetch_oidc_discovery.return_value = mock_discovery
@@ -116,7 +112,9 @@ async def test_config_flow_bare_code(hass: HomeAssistant) -> None:
     sample_store = Store(SAMPLE_STORE_DATA)
 
     payload = {"rewe_id": "11223344", "sub": "x"}
-    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    payload_b64 = (
+        base64.urlsafe_b64encode(json.dumps(payload).encode()).rstrip(b"=").decode()
+    )
     fake_access = f"hdr.{payload_b64}.sig"
 
     mock_discovery = {
@@ -124,9 +122,7 @@ async def test_config_flow_bare_code(hass: HomeAssistant) -> None:
         "token_endpoint": "https://token",
     }
 
-    with patch(
-        "custom_components.penny.config_flow.PennyAPIClient"
-    ) as mock_client_cls:
+    with patch("custom_components.penny.config_flow.PennyAPIClient") as mock_client_cls:
         mock_client = MagicMock()
         mock_client.search_markets.return_value = [sample_store]
         mock_client.fetch_oidc_discovery.return_value = mock_discovery
@@ -170,9 +166,7 @@ async def test_config_flow_invalid_code(hass: HomeAssistant) -> None:
         "token_endpoint": "https://token",
     }
 
-    with patch(
-        "custom_components.penny.config_flow.PennyAPIClient"
-    ) as mock_client_cls:
+    with patch("custom_components.penny.config_flow.PennyAPIClient") as mock_client_cls:
         mock_client = MagicMock()
         mock_client.search_markets.return_value = [sample_store]
         mock_client.fetch_oidc_discovery.return_value = mock_discovery
@@ -193,7 +187,9 @@ async def test_config_flow_invalid_code(hass: HomeAssistant) -> None:
 
         result3 = await hass.config_entries.flow.async_configure(
             result_oauth["flow_id"],
-            user_input={"redirect_url_or_code": "https://www.penny.de/app/login?error=access_denied"},
+            user_input={
+                "redirect_url_or_code": "https://www.penny.de/app/login?error=access_denied"
+            },
         )
     assert result3["type"] == "form"
     errors = result3.get("errors") or {}

@@ -23,7 +23,12 @@ MOCK_EBONS = [
         "id": "ebon-001",
         "timestamp": "2026-09-05T16:00:48Z",
         "totalPrice": 1164,
-        "market": {"name": "PENNY", "street": "Musterstr. 1", "zipCode": "12345", "city": "Berlin"},
+        "market": {
+            "name": "PENNY",
+            "street": "Musterstr. 1",
+            "zipCode": "12345",
+            "city": "Berlin",
+        },
         "cancelled": False,
     }
 ]
@@ -32,7 +37,14 @@ MOCK_SUBSCRIPTION = {"isSubscribed": True}
 
 MOCK_RECEIPT = {
     "items": [
-        {"name": "Pepsi Cola Zero", "price": 8.94, "tax_code": "A", "discount_excluded": False, "quantity": 2, "unit_price": 4.47}
+        {
+            "name": "Pepsi Cola Zero",
+            "price": 8.94,
+            "tax_code": "A",
+            "discount_excluded": False,
+            "quantity": 2,
+            "unit_price": 4.47,
+        }
     ],
     "total": 11.64,
     "payment_method": "EC-Karte",
@@ -46,7 +58,9 @@ MOCK_RECEIPT = {
     "savings": 0.30,
     "loyalty_points": 4,
     "store_vat_id": "DE123",
-    "tax_breakdown": [{"code": "A", "rate_percent": 19.0, "net": 9.78, "tax": 1.86, "gross": 11.64}],
+    "tax_breakdown": [
+        {"code": "A", "rate_percent": 19.0, "net": 9.78, "tax": 1.86, "gross": 11.64}
+    ],
 }
 
 
@@ -81,8 +95,14 @@ async def test_coordinator_fetch_success(hass: HomeAssistant) -> None:
     mock_client.cookies = {}
 
     with (
-        patch("custom_components.penny.coordinator.PennyAPIClient", return_value=mock_client),
-        patch("custom_components.penny.coordinator.parse_ebon_pdf", return_value=MOCK_RECEIPT),
+        patch(
+            "custom_components.penny.coordinator.PennyAPIClient",
+            return_value=mock_client,
+        ),
+        patch(
+            "custom_components.penny.coordinator.parse_ebon_pdf",
+            return_value=MOCK_RECEIPT,
+        ),
         patch("homeassistant.helpers.storage.Store.async_save"),
         patch("asyncio.sleep"),
     ):
@@ -110,7 +130,10 @@ async def test_coordinator_backoff_on_failure(hass: HomeAssistant) -> None:
     mock_client.get_all_ebons.side_effect = RuntimeError("connection error")
 
     with (
-        patch("custom_components.penny.coordinator.PennyAPIClient", return_value=mock_client),
+        patch(
+            "custom_components.penny.coordinator.PennyAPIClient",
+            return_value=mock_client,
+        ),
         patch("homeassistant.helpers.storage.Store.async_save"),
         patch("asyncio.sleep"),
     ):
@@ -126,6 +149,7 @@ async def test_coordinator_uses_cache_on_failure(hass: HomeAssistant) -> None:
     entry = _make_entry(hass)
     coordinator = PennyDataUpdateCoordinator(hass, entry)
     from homeassistant.util import dt as dt_util
+
     coordinator._last_success = dt_util.now()
     coordinator.data = {
         "ebons": MOCK_EBONS,
@@ -143,7 +167,10 @@ async def test_coordinator_uses_cache_on_failure(hass: HomeAssistant) -> None:
     mock_client.get_all_ebons.side_effect = RuntimeError("transient error")
 
     with (
-        patch("custom_components.penny.coordinator.PennyAPIClient", return_value=mock_client),
+        patch(
+            "custom_components.penny.coordinator.PennyAPIClient",
+            return_value=mock_client,
+        ),
         patch("homeassistant.helpers.storage.Store.async_save"),
         patch("asyncio.sleep"),
     ):
@@ -174,8 +201,14 @@ async def test_coordinator_token_refresh(hass: HomeAssistant) -> None:
     mock_client.get_ebon_pdf.return_value = b"%PDF"
 
     with (
-        patch("custom_components.penny.coordinator.PennyAPIClient", return_value=mock_client),
-        patch("custom_components.penny.coordinator.parse_ebon_pdf", return_value=MOCK_RECEIPT),
+        patch(
+            "custom_components.penny.coordinator.PennyAPIClient",
+            return_value=mock_client,
+        ),
+        patch(
+            "custom_components.penny.coordinator.parse_ebon_pdf",
+            return_value=MOCK_RECEIPT,
+        ),
         patch("homeassistant.helpers.storage.Store.async_save"),
         patch("asyncio.sleep"),
     ):
@@ -211,8 +244,14 @@ async def test_coordinator_product_filter(hass: HomeAssistant) -> None:
     mock_client.get_ebon_pdf.return_value = b"%PDF"
 
     with (
-        patch("custom_components.penny.coordinator.PennyAPIClient", return_value=mock_client),
-        patch("custom_components.penny.coordinator.parse_ebon_pdf", return_value=MOCK_RECEIPT),
+        patch(
+            "custom_components.penny.coordinator.PennyAPIClient",
+            return_value=mock_client,
+        ),
+        patch(
+            "custom_components.penny.coordinator.parse_ebon_pdf",
+            return_value=MOCK_RECEIPT,
+        ),
         patch("homeassistant.helpers.storage.Store.async_save"),
         patch("asyncio.sleep"),
     ):
