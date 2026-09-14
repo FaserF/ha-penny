@@ -1,0 +1,78 @@
+{
+  "config": {
+    "flow_title": "PENNY Einrichtung",
+    "step": {
+      "user": {
+        "title": "PENNY einrichten",
+        "description": "Suche nach deinem PENNY-Markt per Postleitzahl oder Ort und wähle optional, ob du dich mit deinem PENNY-Konto anmelden möchtest.",
+        "data": {
+          "search_query": "Postleitzahl oder Ort (z. B. 80331 oder München)",
+          "login_to_account": "Mit PENNY-Konto anmelden (für digitale Kassenbons & Treuepunkte)"
+        }
+      },
+      "select_store": {
+        "title": "PENNY-Markt auswählen",
+        "description": "Wähle deinen PENNY-Markt aus den Suchergebnissen aus:",
+        "data": {
+          "store_key": "PENNY-Markt"
+        }
+      },
+      "oauth": {
+        "title": "Bei PENNY anmelden",
+        "description": "## PENNY Login\n\n1. Öffne die folgende URL im Browser und melde dich mit deinem PENNY-Konto an:\n\n`{auth_url}`\n\n2. Nach der Anmeldung leitet dein Browser auf eine Seite weiter wie:\n`https://www.penny.de/app/login?code=...&state=...`\n\n3. Kopiere die vollständige Weiterleitungs-URL aus der Adresszeile (oder nur den Wert nach `code=`), füge ihn unten ein und klicke auf **Absenden**.",
+        "data": {
+          "redirect_url_or_code": "Weiterleitungs-URL oder Autorisierungscode"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Dieser PENNY-Markt / dieses PENNY-Konto ist bereits eingerichtet.",
+      "no_stores_found": "Keine passenden PENNY-Märkte gefunden."
+    },
+    "error": {
+      "no_stores_found": "Keine passenden PENNY-Märkte für deine Suchanfrage gefunden.",
+      "search_failed": "Marktsuche fehlgeschlagen. Bitte versuche es erneut.",
+      "oidc_discovery_failed": "Der PENNY-Authentifizierungsserver konnte nicht erreicht werden. Bitte überprüfe deine Internetverbindung.",
+      "invalid_code": "Der eingegebene Wert enthält keinen gültigen Autorisierungscode.",
+      "state_mismatch": "Sicherheitsprüfung fehlgeschlagen (State-Ungleichheit). Bitte starte die Einrichtung erneut.",
+      "token_exchange_failed": "Token-Austausch mit PENNY fehlgeschlagen. Der Code ist möglicherweise abgelaufen (Gültigkeit ~60 s). Bitte versuche es erneut.",
+      "cannot_decode_rewe_id": "Die PENNY-Kundennummer konnte nicht aus dem Token ausgelesen werden. Bitte versuche es erneut."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "PENNY konfigurieren",
+        "data": {
+          "update_interval": "Aktualisierungsintervall (Stunden, Min 1, Max 24)",
+          "product_filters": "Kassenbon-Artikelfilter (z. B. Pepsi, Pfand)",
+          "action": "Aktion auswählen"
+        }
+      },
+      "reauth_start": {
+        "title": "Erneut bei PENNY anmelden",
+        "description": "Öffne die folgende URL im Browser und melde dich an:\n\n`{auth_url}`\n\nKlicke danach auf Absenden, um die Weiterleitungs-URL einzugeben.",
+        "data": {
+          "_placeholder": "Klicke auf Absenden zum Fortfahren"
+        }
+      },
+      "reauth_code": {
+        "title": "Weiterleitungs-URL einfügen",
+        "description": "Füge die vollständige Weiterleitungs-URL oder den Wert nach `code=` ein.\n\n**Auth-URL:** `{auth_url}`",
+        "data": {
+          "redirect_url_or_code": "Weiterleitungs-URL oder Autorisierungscode"
+        }
+      }
+    }
+  },
+  "issues": {
+    "connection_error": {
+      "title": "Fehler bei der Kommunikation mit der PENNY API",
+      "description": "Die Integration konnte seit über 24 Stunden keine eBons oder Marktdaten abrufen. Details findest du in den Protokollen."
+    },
+    "auth_expired": {
+      "title": "PENNY-Sitzung abgelaufen",
+      "description": "Deine PENNY-Sitzung ist abgelaufen. Bitte authentifiziere dich über die Integrationsoptionen erneut."
+    }
+  }
+}

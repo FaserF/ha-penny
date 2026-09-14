@@ -1,0 +1,16 @@
+{
+  "domain": "penny",
+  "name": "PENNY",
+  "codeowners": [
+    "@FaserF"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/FaserF/ha-penny",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/FaserF/ha-penny/issues",
+  "requirements": [
+    "curl_cffi>=0.16.3",
+    "pypdf>=6.18.1"
+  ],
+  "version": "0.1.0"
+}

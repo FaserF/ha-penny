@@ -1,0 +1,78 @@
+{
+  "config": {
+    "flow_title": "PENNY Setup",
+    "step": {
+      "user": {
+        "title": "Set up PENNY",
+        "description": "Search for your local PENNY market by postal code or city, and choose whether to log in with your PENNY account.",
+        "data": {
+          "search_query": "Postal code or city (e.g. 80331 or München)",
+          "login_to_account": "Log in with PENNY account (for digital receipts & loyalty points)"
+        }
+      },
+      "select_store": {
+        "title": "Select PENNY Market",
+        "description": "Choose your local PENNY market from the search results:",
+        "data": {
+          "store_key": "PENNY Market"
+        }
+      },
+      "oauth": {
+        "title": "Authenticate with PENNY",
+        "description": "## PENNY Login\n\n1. Open the following URL in your browser and log in with your PENNY account:\n\n`{auth_url}`\n\n2. After login, your browser will redirect to a page like:\n`https://www.penny.de/app/login?code=...&state=...`\n\n3. Copy the full redirect URL from the address bar (or just the `code=` value), paste it below, and click **Submit**.",
+        "data": {
+          "redirect_url_or_code": "Redirect URL or Authorization Code"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This PENNY market/account is already configured.",
+      "no_stores_found": "No PENNY markets found matching your search query."
+    },
+    "error": {
+      "no_stores_found": "No PENNY markets found matching your search query.",
+      "search_failed": "Failed to search for PENNY markets. Please try again.",
+      "oidc_discovery_failed": "Could not reach the PENNY authentication server. Check your internet connection.",
+      "invalid_code": "The pasted value does not contain a valid authorization code.",
+      "state_mismatch": "Security check failed (state mismatch). Please start the setup again.",
+      "token_exchange_failed": "Token exchange with PENNY failed. The code may have expired (codes are valid for ~60 s). Please try again.",
+      "cannot_decode_rewe_id": "Could not read your PENNY customer ID from the token. Please try again."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure PENNY",
+        "data": {
+          "update_interval": "Update Interval (hours, min 1, max 24)",
+          "product_filters": "Receipt Item Filters (e.g. Pepsi, Pfand)",
+          "action": "Select Action"
+        }
+      },
+      "reauth_start": {
+        "title": "Re-authenticate with PENNY",
+        "description": "Open the following URL in your browser and log in:\n\n`{auth_url}`\n\nThen click Submit to enter the redirect URL.",
+        "data": {
+          "_placeholder": "Click Submit to continue"
+        }
+      },
+      "reauth_code": {
+        "title": "Paste the Redirect URL",
+        "description": "Paste the full redirect URL or just the `code=` value.\n\n**Auth URL:** `{auth_url}`",
+        "data": {
+          "redirect_url_or_code": "Redirect URL or Authorization Code"
+        }
+      }
+    }
+  },
+  "issues": {
+    "connection_error": {
+      "title": "Error communicating with PENNY API",
+      "description": "The integration has not been able to fetch eBons or market data for over 24 hours. Check the logs for details."
+    },
+    "auth_expired": {
+      "title": "PENNY authentication expired",
+      "description": "Your PENNY session has expired. Please re-authenticate via the integration settings."
+    }
+  }
+}
