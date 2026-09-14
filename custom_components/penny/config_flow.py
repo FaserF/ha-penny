@@ -428,7 +428,9 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
                             self._config_entry.data.get(CONF_REFRESH_TOKEN, ""),
                         )
                         expires_at = time.time() + int(tokens.get("expires_in", 300))
-                        rewe_id = decode_rewe_id(access_token) or self._config_entry.data.get(CONF_REWE_ID, "")
+                        rewe_id = decode_rewe_id(
+                            access_token
+                        ) or self._config_entry.data.get(CONF_REWE_ID, "")
 
                         new_data = {
                             **self._config_entry.data,

@@ -70,7 +70,13 @@ class PennyEbonSubscriptionSensor(
                     if isinstance(val, bool):
                         return val
                     if isinstance(val, str):
-                        return val.lower() in ("true", "active", "subscribed", "yes", "1")
+                        return val.lower() in (
+                            "true",
+                            "active",
+                            "subscribed",
+                            "yes",
+                            "1",
+                        )
         if isinstance(subscription, list):
             return len(subscription) > 0
         return None
