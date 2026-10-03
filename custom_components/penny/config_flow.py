@@ -215,11 +215,7 @@ class PennyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 if raw.startswith("http"):
                     parsed_state = _extract_param(raw, "state")
                     if parsed_state and parsed_state != self._oauth_state:
-                        _LOGGER.warning(
-                            "PENNY OAuth state mismatch: expected %s, got %s",
-                            self._oauth_state,
-                            parsed_state,
-                        )
+                        _LOGGER.warning("PENNY OAuth state mismatch detected")
                         errors["base"] = "state_mismatch"
                         state_ok = False
 
@@ -401,11 +397,7 @@ class PennyOptionsFlowHandler(config_entries.OptionsFlow):
                 if raw.startswith("http"):
                     parsed_state = _extract_param(raw, "state")
                     if parsed_state and parsed_state != self._oauth_state:
-                        _LOGGER.warning(
-                            "PENNY OAuth state mismatch: expected %s, got %s",
-                            self._oauth_state,
-                            parsed_state,
-                        )
+                        _LOGGER.warning("PENNY OAuth state mismatch detected")
                         errors["base"] = "state_mismatch"
                         state_ok = False
 

@@ -19,7 +19,7 @@
       },
       "oauth": {
         "title": "Authenticate with PENNY",
-        "description": "## PENNY Login\n\n1. Open the following URL in your browser and log in with your PENNY account:\n\n`{auth_url}`\n\n2. After login, your browser will redirect to a page like:\n`https://www.penny.de/app/login?code=...&state=...`\n\n3. Copy the full redirect URL from the address bar (or just the `code=` value), paste it below, and click **Submit**.",
+        "description": "## PENNY Login\n\n1. Open the following URL in your browser and log in with your PENNY account:\n\n`{auth_url}`\n\n2. After login, your browser will redirect to a page starting with `code=...` and `state=...`.\n\n3. Copy the full redirect URL from the address bar (or just the `code=` value), paste it below, and click **Submit**.",
         "data": {
           "redirect_url_or_code": "Redirect URL or Authorization Code"
         }
@@ -51,7 +51,7 @@
       },
       "reauth_start": {
         "title": "Re-authenticate with PENNY",
-        "description": "## PENNY Login\n\n1. Open the following URL in your browser and log in with your PENNY account:\n\n`{auth_url}`\n\n2. After login, your browser will redirect to a page like:\n`https://www.penny.de/app/login?code=...&state=...`\n\n3. Copy the full redirect URL from the address bar (or just the `code=` value), paste it below, and click **Submit**.",
+        "description": "## PENNY Login\n\n1. Open the following URL in your browser and log in with your PENNY account:\n\n`{auth_url}`\n\n2. After login, your browser will redirect to a page starting with `code=...` and `state=...`.\n\n3. Copy the full redirect URL from the address bar (or just the `code=` value), paste it below, and click **Submit**.",
         "data": {
           "redirect_url_or_code": "Redirect URL or Authorization Code"
         }
