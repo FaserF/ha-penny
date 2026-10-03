@@ -25,7 +25,7 @@ body:
     id: ha_version
     attributes:
       label: Home Assistant Version
-      placeholder: e.g. 2026.8.3
+      placeholder: e.g. 2026.9.4
     validations:
       required: true
 
