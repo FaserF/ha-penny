@@ -19,7 +19,10 @@ import uuid
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-import voluptuous as vol
+try:
+    import probatio as vol
+except ImportError:
+    import voluptuous as vol  # type: ignore[no-redef]
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
